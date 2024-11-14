@@ -23,7 +23,7 @@ services:
       REDASH_COOKIE_SECRET: veryverysecrettoken
       REDASH_SECRET_KEY: veryverysecretkey
       REDASH_WEB_WORKERS: 4
-  worker:
+  scheduler:
     build:
       context: .
       dockerfile: Dockerfile.worker
@@ -33,14 +33,30 @@ services:
       REDASH_LOG_LEVEL: "INFO"
       REDASH_REDIS_URL: "redis://redis:6379/0"
       REDASH_DATABASE_URL: "postgresql://postgres@postgres/postgres"
-      QUEUES: "queries,scheduled_queries,celery"
+      REDASH_COOKIE_SECRET: veryverysecrettoken
+      REDASH_SECRET_KEY: veryverysecretkey
+      QUEUES: "queries,scheduled_queries"
       WORKERS_COUNT: 2
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    command: worker
+    environment:
+      PYTHONUNBUFFERED: 0
+      REDASH_LOG_LEVEL: "INFO"
+      REDASH_REDIS_URL: "redis://redis:6379/0"
+      REDASH_DATABASE_URL: "postgresql://postgres@postgres/postgres"
+      REDASH_COOKIE_SECRET: veryverysecrettoken
+      REDASH_SECRET_KEY: veryverysecretkey
+      QUEUES: "periodic emails default"
+      WORKERS_COUNT: 1
+
   redis:
     image: redis:3.0-alpine
   postgres:
     image: postgres:9.5.6-alpine
-    # volumes:
-    #   - /opt/postgres-data:/var/lib/postgresql/data
+
   nginx:
     image: redash/nginx:latest
     ports:
