@@ -5,4 +5,4 @@ ENV QUEUES=${QUEUES}
 
 WORKDIR /app
 
-CMD supervisord -c worker.conf
+CMD exec /app/bin/docker-entrypoint worker
