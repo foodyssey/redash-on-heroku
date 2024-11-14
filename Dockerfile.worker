@@ -5,4 +5,4 @@ ENV QUEUES=${QUEUES}
 
 WORKDIR /app
 
-CMD /usr/local/bin/celery worker --app=redash.worker --beat -c$WORKERS_COUNT -Q$QUEUES -linfo --maxtasksperchild=10 -Ofair
+CMD supervisord -c worker.conf
