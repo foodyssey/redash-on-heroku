@@ -4,7 +4,6 @@
 # Some other recommendations:
 # 1. To persist Postgres data, assign it a volume host location.
 # 2. Split the worker service to adhoc workers and scheduled queries workers.
-version: '2'
 services:
   server:
     build:
@@ -53,7 +52,16 @@ services:
       WORKERS_COUNT: 1
 
   redis:
-    image: redis:3.0-alpine
+    image: redis
+    container_name: redis
+    command: redis-server
+#      /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis:/usr/local/etc/redis
+      - ./redis/tls:/tls
+    ports:
+      - '6379:6379'
+
   postgres:
     image: postgres:9.5.6-alpine
 
