@@ -1,5 +1,5 @@
-FROM redash/redash:latest
-
+FROM redash/redash:8.0.0.b32245
+RUN pip install --user kombu==4.6.11
 ENV WORKERS_COUNT=${WORKERS_COUNT:-1}
 ENV QUEUES=${QUEUES:-celery}
 
