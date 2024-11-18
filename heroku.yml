@@ -1,4 +1,9 @@
 build:
   docker:
     web: Dockerfile.web
+    scheduler: Dockerfile.scheduler
     worker: Dockerfile.worker
+  config:
+    code_coverage: true
+    skip_dev_deps: true
+    skip_ds_deps: true

@@ -25,7 +25,7 @@ services:
   scheduler:
     build:
       context: .
-      dockerfile: Dockerfile.worker
+      dockerfile: Dockerfile.scheduler
     command: scheduler
     environment:
       PYTHONUNBUFFERED: 0
