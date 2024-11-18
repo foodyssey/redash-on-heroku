@@ -1,51 +1,64 @@
-# This is an example configuration for Docker Compose. Make sure to atleast update
-# the cookie secret & postgres database password.
-#
-# Some other recommendations:
-# 1. To persist Postgres data, assign it a volume host location.
-# 2. Split the worker service to adhoc workers and scheduled queries workers.
-version: '2'
+version: '3.4'
+x-server-environment: &server-environment
+    DATABASE_URL: ${DATABASE_URL:-postgres://postgres:postgres@postgres:5432/postgres}
+    REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    REDASH_COOKIE_SECRET: ${REDASH_COOKIE_SECRET:-redash_cookie_secret}
+
+x-server-image: &server-image
+    build:
+        context: .
+        dockerfile: docker/Dockerfile
+    environment:
+        <<: *server-environment
+
 services:
-  server:
-    build:
-      context: .
-      dockerfile: Dockerfile.web
-    command: server
-    depends_on:
-      - postgres
-      - redis
-    environment:
-      PORT: 5000
-      PYTHONUNBUFFERED: 0
-      REDASH_LOG_LEVEL: "INFO"
-      REDASH_REDIS_URL: "redis://redis:6379/0"
-      REDASH_DATABASE_URL: "postgresql://postgres@postgres/postgres"
-      REDASH_COOKIE_SECRET: veryverysecrettoken
-      REDASH_SECRET_KEY: veryverysecretkey
-      REDASH_WEB_WORKERS: 4
-  worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    command: scheduler
-    environment:
-      PYTHONUNBUFFERED: 0
-      REDASH_LOG_LEVEL: "INFO"
-      REDASH_REDIS_URL: "redis://redis:6379/0"
-      REDASH_DATABASE_URL: "postgresql://postgres@postgres/postgres"
-      QUEUES: "queries,scheduled_queries,celery"
-      WORKERS_COUNT: 2
-  redis:
-    image: redis:3.0-alpine
-  postgres:
-    image: postgres:9.5.6-alpine
-    # volumes:
-    #   - /opt/postgres-data:/var/lib/postgresql/data
-  nginx:
-    image: redash/nginx:latest
-    ports:
-      - "8080:80"
-    depends_on:
-      - server
-    links:
-      - server:redash
+    server:
+        <<: *server-image
+        ports:
+            - 3000:3000
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: web
+        environment:
+            <<: *server-environment
+            PORT: ${PORT:-3000}
+        depends_on:
+            - redis
+            - worker
+            - scheduler
+
+    worker:
+        <<: *server-image
+        build:
+          dockerfile: Dockerfile
+          target: worker
+        depends_on:
+            - redis
+            - postgres
+
+    scheduler:
+        <<: *server-image
+        build:
+            dockerfile: Dockerfile
+            target: scheduler
+
+
+    redis:
+        image: redis
+        command: redis-server --appendonly yes
+        volumes:
+            - ./.docker-volumes/redis:/data
+        expose:
+            - 6379
+
+    postgres:
+        image: postgres
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER:-postgres}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+            POSTGRES_DB: ${POSTGRES_DB:-postgres}
+        volumes:
+            - ./.docker-volumes/postgres:/var/lib/postgresql/data
+        expose:
+            - 5432
