@@ -1,5 +1,8 @@
 FROM redash/redash:10.1.0.b50633
 
+RUN pip install --user --upgrade greenlet
+RUN pip install --user --upgrade gevent
+
 ENTRYPOINT ["/app/bin/docker-entrypoint"]
 
 CMD exec /app/bin/docker-entrypoint scheduler
