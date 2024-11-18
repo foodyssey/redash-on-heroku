@@ -63,14 +63,13 @@ heroku config:set REDASH_MAIL_DEFAULT_SENDER=YOUR_MAIL_ADDRESS --app $app_name
 heroku config:set REDASH_REDIS_URL=$REDIS_URL --app $app_name
 heroku config:set REDASH_DATABASE_URL=$POSTGRES_URL --app $app_name
 ```
-- Test : `Add ?ssl_cert_reqs=CERT_NONE` to REDASH_REDIS_URL
 
 See also https://redash.io/help/open-source/setup#-setup
 
 ### Release container
 
 ```sh
-git push heroku master
+git push heroku main
 ```
 
 ### Create database
@@ -91,9 +90,9 @@ heroku ps:scale worker=1 --app $app_name
 
 ```sh
 heroku ps:scale web=0 worker=0
-git push heroku master
-heroku run /app/manage.py db upgrade
-heroku ps:scale web=1 worker=1
+git push heroku main
+heroku run "exec /app/bin/docker-entrypoint create_db" --app $app_name
+heroku ps:scale web=1 worker=1 scheduler=1
 ```
 
 See also https://redash.io/help/open-source/admin-guide/how-to-upgrade

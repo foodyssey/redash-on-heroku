@@ -1,4 +1,11 @@
 build:
   docker:
-    web: Dockerfile.web
-    worker: Dockerfile.worker
+    web:
+      dockerfile: Dockerfile
+      target: web
+    scheduler:
+      dockerfile: Dockerfile
+      target: scheduler
+    worker:
+      dockerfile: Dockerfile
+      target: worker
