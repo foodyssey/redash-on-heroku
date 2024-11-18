@@ -89,10 +89,22 @@ heroku ps:scale worker=1 --app $app_name
 ## How to upgrade
 
 ```sh
-heroku ps:scale web=0 worker=0
+app_name=foodyssey-redash-staging
+heroku ps:scale web=0 worker=0  --app $app_name
 git push heroku main
-heroku run "exec /app/bin/docker-entrypoint create_db" --app $app_name
-heroku ps:scale web=1 worker=1 scheduler=1
+
+heroku ps:scale web=1 worker=1 scheduler=1 --app $app_name
+heroku ps:type worker=standard-2x scheduler=standard-2x web=standard-2x
+
+heroku run manage db upgrade --app $app_name --size=performance-m
 ```
+
+
+# Change Redis url to use TLS
+
+```shell
+REDIS_URL=rediss://xxx?ssl_cert_reqs=none
+```
+
 
 See also https://redash.io/help/open-source/admin-guide/how-to-upgrade
