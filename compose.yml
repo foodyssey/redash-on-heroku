@@ -43,7 +43,6 @@ services:
             dockerfile: Dockerfile
             target: scheduler
 
-
     redis:
         image: redis
         command: redis-server --appendonly yes
@@ -53,7 +52,7 @@ services:
             - 6379
 
     postgres:
-        image: postgres
+        image: postgres:16.3
         environment:
             POSTGRES_USER: ${POSTGRES_USER:-postgres}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
