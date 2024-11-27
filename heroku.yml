@@ -9,3 +9,6 @@ build:
     worker:
       dockerfile: Dockerfile
       target: worker
+    scheduled_worker:
+      dockerfile: Dockerfile
+      target: scheduled_worker

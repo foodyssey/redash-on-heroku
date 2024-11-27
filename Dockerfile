@@ -8,5 +8,8 @@ CMD export MAX_REQUESTS=${MAX_REQUESTS:-1000}; export MAX_REQUESTS_JITTER=${MAX_
 FROM base AS scheduler
 CMD exec /app/bin/docker-entrypoint scheduler
 
+FROM base AS scheduled_worker
+CMD export QUEUES="queries,scheduled_queries,schema"; exec /app/bin/docker-entrypoint worker
+
 FROM base AS worker
-CMD exec /app/bin/docker-entrypoint worker
+CMD export QUEUES="periodic email default"; exec /app/bin/docker-entrypoint worker
