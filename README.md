@@ -89,12 +89,12 @@ heroku ps:scale worker=1 --app $app_name
 ## How to upgrade
 
 ```sh
-app_name=foodyssey-redash-staging
+app_name=foodyssey-redash
 heroku ps:scale web=0 worker=0  --app $app_name
 git push heroku main
 
 heroku ps:scale web=1 worker=1 scheduler=1 --app $app_name
-heroku ps:type worker=standard-2x scheduler=standard-2x web=standard-2x
+heroku ps:type worker=standard-2x scheduler=standard-2x web=standard-2x --app $app_name
 
 heroku run manage db upgrade --app $app_name --size=performance-m
 ```
